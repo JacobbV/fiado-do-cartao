@@ -1,0 +1,23 @@
+rules_version = '2';
+
+// Fiado do Cartão — uso pessoal.
+// Só a conta do dono (UID abaixo) lê e grava, e só dentro da própria pasta.
+// Qualquer outra pessoa, mesmo logada com Google, é bloqueada.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function ehDono() {
+      return request.auth != null
+        && request.auth.uid == 'COLE_SEU_UID_AQUI';
+    }
+
+    match /usuarios/{uid}/fiado/{doc} {
+      allow read, write: if ehDono() && request.auth.uid == uid;
+    }
+
+    // Todo o resto do banco fica fechado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

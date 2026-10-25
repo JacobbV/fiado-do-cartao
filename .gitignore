@@ -1,0 +1,12 @@
+# Seus dados financeiros nunca devem ir para o repositório público
+*.csv
+fiado-backup*.json
+lancamentos*
+
+# Arquivos locais do Firebase CLI
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+.DS_Store
