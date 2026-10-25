@@ -8,7 +8,7 @@ service cloud.firestore {
 
     function ehDono() {
       return request.auth != null
-        && request.auth.uid == 'COLE_SEU_UID_AQUI';
+        && request.auth.uid == 'lToHfYrJOiNppzfw4ZdHzea08k12';
     }
 
     match /usuarios/{uid}/fiado/{doc} {
