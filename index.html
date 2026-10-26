@@ -79,6 +79,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-off
 .monthnav b{font-size:18px}
 .person-h{display:flex;align-items:center;gap:8px;margin:4px 0 2px;flex-wrap:wrap}
 .banner.alerta{background:var(--bad-soft)}
+#tab-sobre b a{color:var(--pri);text-decoration:none}
+#tab-sobre b a:hover{text-decoration:underline}
+#tab-sobre a.btn{color:var(--tx)}
 .banner .btn{margin-left:6px}
 .tabela{overflow-x:auto;margin:0 -4px}
 .tabela table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
@@ -132,14 +135,12 @@ footer a{color:inherit}
   <section id="tab-pessoas" class="hidden"></section>
   <section id="tab-relatorio" class="hidden"></section>
   <section id="tab-config" class="hidden"></section>
+  <section id="tab-sobre" class="hidden"></section>
 </main>
 
 <footer id="creditos">
-  Dados sincronizados na sua conta pelo <a href="https://firebase.google.com/" target="_blank" rel="noopener">Firebase</a> (Authentication + Cloud Firestore, Google).<br>
-  Firebase JS SDK: licença <a href="https://github.com/firebase/firebase-js-sdk/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0</a>, servido via gstatic.com ·
-  Gráficos: <a href="https://www.chartjs.org/" target="_blank" rel="noopener">Chart.js</a> (licença <a href="https://github.com/chartjs/Chart.js/blob/master/LICENSE.md" target="_blank" rel="noopener">MIT</a>), servido via <a href="https://cdnjs.com/libraries/Chart.js" target="_blank" rel="noopener">cdnjs</a>.
-  Logotipo do Google no botão de login conforme as <a href="https://developers.google.com/identity/branding-guidelines" target="_blank" rel="noopener">diretrizes de marca do Google Sign-In</a>.
-  Cobrança enviada pelo link oficial <a href="https://faq.whatsapp.com/" target="_blank" rel="noopener">wa.me</a> do WhatsApp (marca da Meta; o app não usa o logotipo dela). Ícones do app desenhados pelo autor.
+  Fiado do Cartão <span class="versao"></span> · por Jacó · usa Firebase, Chart.js e WhatsApp ·
+  <a href="#" onclick="irPara('sobre');return false">Sobre, créditos e licenças</a>
 </footer>
 
 <nav class="tabs">
@@ -161,6 +162,7 @@ footer a{color:inherit}
 <script>
 /* ========= Estado ========= */
 const LS_KEY = 'fiado-do-cartao-v1';
+const APP_VERSAO = 'v2.1';
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const CORES = ['#ea580c','#0d9488','#7c3aed','#2563eb','#db2777','#ca8a04','#16a34a','#64748b','#dc2626','#0891b2'];
 
@@ -279,7 +281,7 @@ function irPara(t){
   renderTudo(); window.scrollTo(0,0);
 }
 function renderTudo(){
-  ({resumo:renderResumo,faturas:renderFaturas,lancar:renderLancar,pessoas:renderPessoas,relatorio:renderRelatorio,config:renderConfig})[tab]();
+  ({resumo:renderResumo,faturas:renderFaturas,lancar:renderLancar,pessoas:renderPessoas,relatorio:renderRelatorio,config:renderConfig,sobre:renderSobre})[tab]();
 }
 
 /* ========= Resumo ========= */
@@ -553,6 +555,84 @@ function renderRelatorio(){
   });
 }
 
+/* ========= Sobre ========= */
+const CREDITOS = [
+  { nome:'Firebase JS SDK', ver:'10.14.1', uso:'Login com Google e banco de dados em nuvem',
+    lic:'Apache 2.0', licUrl:'https://github.com/firebase/firebase-js-sdk/blob/main/LICENSE',
+    url:'https://github.com/firebase/firebase-js-sdk', fonte:'Google · servido por www.gstatic.com' },
+  { nome:'Firebase Authentication e Cloud Firestore', ver:'', uso:'Serviços que guardam a conta e os dados',
+    lic:'Termos do Firebase', licUrl:'https://firebase.google.com/terms',
+    url:'https://firebase.google.com/', fonte:'Google · plano gratuito Spark' },
+  { nome:'Chart.js', ver:'4.4.1', uso:'Gráficos do Resumo e do Relatório',
+    lic:'MIT', licUrl:'https://github.com/chartjs/Chart.js/blob/master/LICENSE.md',
+    url:'https://www.chartjs.org/', fonte:'Chart.js Contributors · servido por cdnjs (Cloudflare)' },
+  { nome:'cdnjs', ver:'', uso:'Entrega do Chart.js',
+    lic:'Termos do cdnjs', licUrl:'https://cdnjs.com/about',
+    url:'https://cdnjs.com/', fonte:'Cloudflare' },
+  { nome:'Logotipo "G" do Google', ver:'', uso:'Botão "Entrar com Google"',
+    lic:'Diretrizes de marca do Google Sign-In', licUrl:'https://developers.google.com/identity/branding-guidelines',
+    url:'https://developers.google.com/identity', fonte:'Google · marca registrada do Google LLC' },
+  { nome:'Link wa.me do WhatsApp', ver:'', uso:'Abrir a conversa com a mensagem de cobrança',
+    lic:'Termos do WhatsApp', licUrl:'https://www.whatsapp.com/legal/terms-of-service',
+    url:'https://faq.whatsapp.com/', fonte:'WhatsApp é marca da Meta Platforms; o app não usa o logotipo' },
+  { nome:'GitHub Pages', ver:'', uso:'Hospedagem do site',
+    lic:'Termos do GitHub', licUrl:'https://docs.github.com/pt/site-policy/github-terms/github-terms-of-service',
+    url:'https://pages.github.com/', fonte:'GitHub' }
+];
+const HISTORICO = [
+  ['v2.1','26/10/2026','Tela Sobre com créditos, licenças e histórico.'],
+  ['v2.0','25/10/2026','Cobrança pelo WhatsApp, aviso de vencimento, aba Relatório e app instalável (PWA).'],
+  ['v1.1','25/10/2026','Login com Google e dados na nuvem (Firebase), sincronizando celular e PC.'],
+  ['v1.0','25/10/2026','Primeira versão: lançamentos, parcelas por fatura, gráfico, importação do CSV.']
+];
+function renderSobre(){
+  const el = document.getElementById('tab-sobre');
+  const ext = (u,t) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+  el.innerHTML = `
+  <div style="margin-bottom:12px"><button class="btn sec sm" onclick="irPara('config')">‹ Ajustes</button></div>
+  <div class="card" style="text-align:center">
+    <div class="logo" style="width:64px;height:64px;border-radius:18px;margin:4px auto 10px"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" style="width:40px"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg></div>
+    <h2 style="font-size:20px;margin:0">Fiado do Cartão</h2>
+    <div class="muted small">Versão ${APP_VERSAO}</div>
+    <p style="margin:12px 0 0">Controle pessoal de quem usa o meu cartão de crédito e quanto cada um deve, fatura por fatura.</p>
+  </div>
+
+  <div class="card"><h2>Autor</h2>
+    <div class="row" style="border:0;padding-top:0"><div class="grow"><b>Rameson Jacó</b> (Jacó)<div class="muted small">Catolé do Rocha · PB</div></div></div>
+    <div class="actions">${'<a class="btn sec sm" style="text-decoration:none" href="https://github.com/JacobbV" target="_blank" rel="noopener">GitHub @JacobbV</a>'}
+      <a class="btn sec sm" style="text-decoration:none" href="https://github.com/JacobbV/fiado-do-cartao" target="_blank" rel="noopener">Código-fonte</a></div>
+    <p class="muted small" style="margin-bottom:0">© 2026 Rameson Jacó. Código e ícones do app feitos pelo autor; todos os direitos reservados, exceto as bibliotecas e serviços de terceiros listados abaixo, que seguem as próprias licenças.</p>
+  </div>
+
+  <div class="card"><h2>Como funciona</h2>
+    <p class="small" style="margin-top:0">Cada compra é dividida em parcelas e cada parcela é colocada na fatura certa usando o dia de <b>fechamento</b> e de <b>vencimento</b> do cartão: compra antes do fechamento entra na fatura aberta; no dia ou depois, vai para a seguinte. A fatura é identificada pelo mês em que vence.</p>
+  </div>
+
+  <div class="card"><h2>Privacidade e segurança</h2>
+    <ul class="small" style="margin:0;padding-left:18px;line-height:1.6">
+      <li>Os dados ficam no Cloud Firestore, ligados à conta Google do dono.</li>
+      <li>As regras de segurança só deixam <b>uma conta</b> ler e gravar; qualquer outra é bloqueada.</li>
+      <li>A chave de API só funciona a partir do site do app.</li>
+      <li>O app não pede nem guarda número de cartão, senha ou dados bancários.</li>
+      <li>Telefones salvos servem só para abrir o WhatsApp na hora da cobrança.</li>
+    </ul>
+  </div>
+
+  <div class="card"><h2>Créditos e licenças</h2>
+    ${CREDITOS.map(c=>`<div class="row" style="align-items:flex-start">
+      <div class="grow"><b>${ext(c.url,esc(c.nome))}</b>${c.ver?` <span class="chip">${c.ver}</span>`:''}
+        <div class="small">${esc(c.uso)}</div>
+        <div class="muted small">${esc(c.fonte)}</div></div>
+      <div style="text-align:right;flex:none;max-width:42%"><a class="chip ok" style="text-decoration:none" href="${c.licUrl}" target="_blank" rel="noopener">${esc(c.lic)}</a></div></div>`).join('')}
+    <p class="muted small" style="margin-bottom:0">Fontes: as do próprio sistema (nenhuma fonte externa). Marcas citadas pertencem aos seus donos e aparecem só para identificar o serviço usado.</p>
+  </div>
+
+  <div class="card"><h2>Histórico de versões</h2>
+    ${HISTORICO.map(([v,d,t])=>`<div class="row" style="align-items:flex-start"><span class="chip ${v===APP_VERSAO?'ok':''}" style="margin:2px 0 0;flex:none">${v}</span>
+      <div class="grow small">${esc(t)}<div class="muted">${d}</div></div></div>`).join('')}
+  </div>`;
+}
+
 /* ========= Diálogos ========= */
 const dlg = document.getElementById('dlg'), dlgBody = document.getElementById('dlgBody');
 function abrirDlg(titulo, html){
@@ -708,6 +788,9 @@ function renderConfig(){
   <div class="card"><h2>Conta</h2>
     <p class="small" style="margin-top:0">Conectado como <b>${esc(window.usuarioAtual?window.usuarioAtual.email:'—')}</b>. Seus dados ficam no Firestore e sincronizam entre celular e PC.</p>
     <div class="actions"><button class="btn sec sm" onclick="copiarUID()">Copiar meu UID</button><button class="btn sec sm" onclick="sair()">Sair</button></div></div>
+  <div class="card click" onclick="irPara('sobre')" style="display:flex;align-items:center;gap:12px">
+    <div style="flex:1"><h2 style="margin:0">Sobre o app</h2><div class="muted small">Versão ${APP_VERSAO}, autor, créditos e licenças</div></div>
+    <span class="muted" style="font-size:20px">›</span></div>
   <div class="card"><h2>Zona de perigo</h2><button class="btn danger" onclick="apagarTudo()">Apagar todos os dados</button></div>`;
   document.getElementById('fCfg').onsubmit = e=>{ e.preventDefault(); const f = e.target;
     state.config.fechamento = Math.min(31,Math.max(1,+f.fechamento.value)); state.config.vencimento = Math.min(31,Math.max(1,+f.vencimento.value));
@@ -786,6 +869,8 @@ let tT;
 function toast(m){ const t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tT); tT = setTimeout(()=>t.classList.remove('on'),2800); }
 
 renderTudo();
+
+document.querySelectorAll('.versao').forEach(e=>e.textContent = APP_VERSAO);
 
 /* App instalável (PWA) */
 if('serviceWorker' in navigator && location.protocol !== 'file:'){

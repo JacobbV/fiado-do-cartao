@@ -14,6 +14,16 @@ Lanço "Roupa · Beatriz · R$ 150 · 3x" e o app calcula em qual fatura cai cad
 - **Relatório**: total do ano, média por fatura, quem mais usou, recebido no ano, ranking e tabela pessoa × fatura.
 - **Ajustes**: fechamento/vencimento, chave Pix, importar/exportar CSV, backup JSON, conta.
 - **App instalável (PWA)**: ícone próprio na tela inicial e abre em tela cheia, mesmo com internet fraca.
+- **Sobre**: versão, autor, como funciona, privacidade, créditos com licenças e histórico de versões (⚙ Ajustes → Sobre o app, ou link no rodapé).
+
+## Histórico de versões
+
+| Versão | Data | Mudanças |
+|---|---|---|
+| v2.1 | 26/10/2026 | Tela Sobre com créditos, licenças e histórico |
+| v2.0 | 25/10/2026 | Cobrança pelo WhatsApp, aviso de vencimento, Relatório, PWA |
+| v1.1 | 25/10/2026 | Login com Google e dados no Firebase |
+| v1.0 | 25/10/2026 | Primeira versão |
 
 **Regra das faturas:** compra **antes** do fechamento entra na fatura aberta; **no dia ou depois**, vai para a seguinte. A fatura é identificada pelo mês em que **vence**.
 

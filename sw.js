@@ -2,7 +2,7 @@
 // - Arquivos do app: tenta a rede primeiro (pega sempre a versão nova) e cai no cache se estiver offline.
 // - Bibliotecas versionadas (Firebase SDK, Chart.js): cache primeiro.
 // - Chamadas ao Firebase (login e banco) NÃO passam por aqui; o próprio Firestore cuida do modo offline.
-const CACHE = 'fiado-v2';
+const CACHE = 'fiado-v2.1';
 const ARQUIVOS = [
   './',
   './index.html',
