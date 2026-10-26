@@ -6,6 +6,12 @@
 <title>Fiado do Cartão</title>
 <meta name="description" content="Controle simples de quem usa seu cartão de crédito e quanto cada um te deve por fatura.">
 <meta name="theme-color" content="#c2410c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fiado">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23c2410c'/><rect x='18' y='30' width='64' height='42' rx='7' fill='%23fff'/><rect x='18' y='40' width='64' height='8' fill='%237c2d12'/><rect x='26' y='56' width='20' height='6' rx='2' fill='%23c2410c'/></svg>">
 <style>
 :root{
@@ -60,8 +66,9 @@ h2{font-size:16px;margin:0 0 10px}
 .click{cursor:pointer}
 label.f{display:block;margin-bottom:12px}
 label.f span{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
-input[type=text],input[type=number],input[type=date],input[type=month],select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
-input:focus,select:focus{outline:2px solid var(--pri);outline-offset:-1px}
+input[type=text],input[type=number],input[type=date],input[type=month],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+textarea{font:inherit;color:inherit;font-size:14px;line-height:1.45;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:-1px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .seg{display:flex;background:var(--chip);border-radius:10px;padding:3px;margin-bottom:12px}
 .seg button{flex:1;border:0;background:none;padding:8px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--mut)}
@@ -70,7 +77,16 @@ input:focus,select:focus{outline:2px solid var(--pri);outline-offset:-1px}
 .banner{background:var(--pri-soft);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:14px}
 .monthnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
 .monthnav b{font-size:18px}
-.person-h{display:flex;align-items:center;gap:8px;margin:4px 0 2px}
+.person-h{display:flex;align-items:center;gap:8px;margin:4px 0 2px;flex-wrap:wrap}
+.banner.alerta{background:var(--bad-soft)}
+.banner .btn{margin-left:6px}
+.tabela{overflow-x:auto;margin:0 -4px}
+.tabela table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+.tabela th,.tabela td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.tabela th:first-child,.tabela td:first-child{text-align:left;position:sticky;left:0;background:var(--card)}
+.tabela th{color:var(--mut);font-weight:600;font-size:12px}
+.tabela tr.tot td{font-weight:700;border-bottom:0}
+.tabela td.zero{color:var(--mut);opacity:.5}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
 .bar{height:6px;background:var(--chip);border-radius:99px;overflow:hidden;margin-top:6px}
 .bar i{display:block;height:100%;background:var(--pri)}
@@ -114,6 +130,7 @@ footer a{color:inherit}
   <section id="tab-faturas" class="hidden"></section>
   <section id="tab-lancar" class="hidden"></section>
   <section id="tab-pessoas" class="hidden"></section>
+  <section id="tab-relatorio" class="hidden"></section>
   <section id="tab-config" class="hidden"></section>
 </main>
 
@@ -121,7 +138,8 @@ footer a{color:inherit}
   Dados sincronizados na sua conta pelo <a href="https://firebase.google.com/" target="_blank" rel="noopener">Firebase</a> (Authentication + Cloud Firestore, Google).<br>
   Firebase JS SDK: licença <a href="https://github.com/firebase/firebase-js-sdk/blob/main/LICENSE" target="_blank" rel="noopener">Apache 2.0</a>, servido via gstatic.com ·
   Gráficos: <a href="https://www.chartjs.org/" target="_blank" rel="noopener">Chart.js</a> (licença <a href="https://github.com/chartjs/Chart.js/blob/master/LICENSE.md" target="_blank" rel="noopener">MIT</a>), servido via <a href="https://cdnjs.com/libraries/Chart.js" target="_blank" rel="noopener">cdnjs</a>.
-  Logotipo do Google no botão de login conforme as <a href="https://developers.google.com/identity/branding-guidelines" target="_blank" rel="noopener">diretrizes de marca do Google Sign-In</a>. Demais ícones desenhados no próprio app.
+  Logotipo do Google no botão de login conforme as <a href="https://developers.google.com/identity/branding-guidelines" target="_blank" rel="noopener">diretrizes de marca do Google Sign-In</a>.
+  Cobrança enviada pelo link oficial <a href="https://faq.whatsapp.com/" target="_blank" rel="noopener">wa.me</a> do WhatsApp (marca da Meta; o app não usa o logotipo dela). Ícones do app desenhados pelo autor.
 </footer>
 
 <nav class="tabs">
@@ -129,6 +147,7 @@ footer a{color:inherit}
   <button data-tab="faturas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Faturas</button>
   <button data-tab="lancar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Lançar</button>
   <button data-tab="pessoas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.5c2.4.2 4 1.8 4.6 4.5"/></svg>Pessoas</button>
+  <button data-tab="relatorio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>Relatório</button>
   <button data-tab="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Ajustes</button>
 </nav>
 
@@ -145,9 +164,9 @@ const LS_KEY = 'fiado-do-cartao-v1';
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const CORES = ['#ea580c','#0d9488','#7c3aed','#2563eb','#db2777','#ca8a04','#16a34a','#64748b','#dc2626','#0891b2'];
 
-function novoEstado(){ return { config:{ fechamento:null, vencimento:null }, itens:[], pagamentos:[] }; }
+function novoEstado(){ return { config:{ fechamento:null, vencimento:null, pix:'' }, itens:[], pagamentos:[], contatos:{} }; }
 function normalizar(o){ const n = novoEstado();
-  return { config:Object.assign(n.config, (o&&o.config)||{}), itens:(o&&o.itens)||[], pagamentos:(o&&o.pagamentos)||[] }; }
+  return { config:Object.assign(n.config, (o&&o.config)||{}), itens:(o&&o.itens)||[], pagamentos:(o&&o.pagamentos)||[], contatos:(o&&o.contatos)||{} }; }
 function lerLocalAntigo(){ // dados da versão antiga (sem Firebase), para migrar
   try{ const s = localStorage.getItem(LS_KEY); return s ? normalizar(JSON.parse(s)) : null; }catch(e){ return null; }
 }
@@ -260,7 +279,7 @@ function irPara(t){
   renderTudo(); window.scrollTo(0,0);
 }
 function renderTudo(){
-  ({resumo:renderResumo,faturas:renderFaturas,lancar:renderLancar,pessoas:renderPessoas,config:renderConfig})[tab]();
+  ({resumo:renderResumo,faturas:renderFaturas,lancar:renderLancar,pessoas:renderPessoas,relatorio:renderRelatorio,config:renderConfig})[tab]();
 }
 
 /* ========= Resumo ========= */
@@ -277,6 +296,7 @@ function renderResumo(){
   let h = '';
   if(!configurado()) h += `<div class="banner"><b>Primeiro passo:</b> informe o dia de <b>fechamento</b> e de <b>vencimento</b> do cartão para o app saber em qual fatura cada compra cai. <button class="btn sm" onclick="irPara('config')">Configurar</button></div>`;
   if(!state.itens.length) h += `<div class="banner">Ainda não tem nada lançado. Use <b>Lançar</b> ou importe seu CSV em <b>⚙ Ajustes</b>.</div>`;
+  h += avisoVencimento();
 
   h += `<div class="grid">
     <div class="stat hl"><div class="l">${configurado()?'Vence '+dataVenc(pf).slice(0,5):'Fatura '+nomeFat(pf)}</div><div class="v">${brl(vPf)}</div></div>
@@ -294,7 +314,8 @@ function renderResumo(){
   lista.forEach(([n,v])=>{
     const atr = soma(atras.filter(i=>i.pessoa===n));
     h += `<div class="row click" onclick="abrirExtrato('${esc(n).replace(/'/g,"\\'")}')"><span class="dot" style="background:${corDe(n)}"></span>
-      <div class="grow t">${esc(n)}${atr>0?`<span class="chip bad">${brl(atr)} atrasado</span>`:''}</div><div class="num">${brl(v)}</div></div>`;
+      <div class="grow t">${esc(n)}${atr>0?`<span class="chip bad">${brl(atr)} atrasado</span>`:''}</div><div class="num">${brl(v)}</div>
+      <button class="btn sec sm" title="Cobrar no WhatsApp" onclick="event.stopPropagation();dlgCobrar('${esc(n).replace(/'/g,"\\'")}')">${ICONE_MSG}</button></div>`;
   });
   h += `</div>`;
 
@@ -303,6 +324,25 @@ function renderResumo(){
     <div class="chartbox"><canvas id="graf"></canvas></div><div id="grafMsg"></div></div>`;
   el.innerHTML = h;
   desenharGrafico();
+}
+
+/* Aviso: fatura já fechou ou está perto de vencer e ainda falta receber */
+function avisoVencimento(){
+  if(!configurado()) return '';
+  const pf = proximaFatura(), [y,m] = pf.split('-').map(Number);
+  const V = +state.config.vencimento, F = +state.config.fechamento;
+  const venc = new Date(y, m-1, Math.min(V, new Date(y,m,0).getDate()));
+  const mf = V > F ? pf : addMes(pf,-1), [fy,fm] = mf.split('-').map(Number);
+  const fech = new Date(fy, fm-1, Math.min(F, new Date(fy,fm,0).getDate()));
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const dias = Math.round((venc - hoje) / 864e5);
+  const falta = soma(state.itens.filter(i=>!i.pago && i.fatura<=pf));
+  if(falta <= 0) return '';
+  const quando = dias<=0 ? '<b>vence hoje</b>' : dias===1 ? 'vence <b>amanhã</b>' : `vence em <b>${dias} dias</b> (${dataVenc(pf).slice(0,5)})`;
+  const botao = `<button class="btn sm" onclick="faturaSel='${pf}';irPara('faturas')">Ver quem cobrar</button>`;
+  if(hoje >= fech) return `<div class="banner ${dias<=3?'alerta':''}">🔔 A fatura de <b>${nomeFat(pf)}</b> já fechou e ${quando}. Falta receber <b>${brl(falta)}</b>. ${botao}</div>`;
+  if(dias <= 7) return `<div class="banner ${dias<=3?'alerta':''}">🔔 A fatura de <b>${nomeFat(pf)}</b> ${quando}. Falta receber <b>${brl(falta)}</b>. ${botao}</div>`;
+  return '';
 }
 
 function desenharGrafico(){
@@ -351,7 +391,7 @@ function renderFaturas(){
     const its = itens.filter(i=>i.pessoa===n);
     const p = soma(its.filter(i=>!i.pago)), nq = esc(n).replace(/'/g,"\\'");
     h += `<div class="card"><div class="person-h"><span class="dot" style="background:${corDe(n)}"></span><b class="grow" style="flex:1">${esc(n)}</b>
-      ${p>0?`<button class="btn sm" onclick="receberFatura('${nq}')">Recebi ${brl(p)}</button>`:`<span class="chip ok">quitado</span>`}</div>`;
+      ${p>0?`<button class="btn sec sm" onclick="dlgCobrar('${nq}',faturaSel)" title="Cobrar no WhatsApp">${ICONE_MSG} Cobrar</button><button class="btn sm" onclick="receberFatura('${nq}')">Recebi ${brl(p)}</button>`:`<span class="chip ok">quitado</span>`}</div>`;
     its.forEach(i=>{
       h += `<div class="row"><input type="checkbox" ${i.pago?'checked':''} onchange="togglePago('${i.id}')" aria-label="pago">
         <div class="grow click" onclick="editarItem('${i.id}')"><div class="t" style="${i.pago?'text-decoration:line-through;opacity:.6':''}">${esc(i.descricao)}</div>
@@ -461,6 +501,58 @@ function renderPessoas(){
   el.innerHTML = h;
 }
 
+/* ========= Relatório ========= */
+let relAno = null, chartRel = null;
+function renderRelatorio(){
+  const el = document.getElementById('tab-relatorio');
+  const anos = [...new Set(state.itens.map(i=>i.fatura.slice(0,4)).concat([String(new Date().getFullYear())]))].sort();
+  if(!relAno || !anos.includes(relAno)) relAno = String(new Date().getFullYear());
+  const doAno = state.itens.filter(i=>i.fatura.startsWith(relAno));
+  const meses = Array.from({length:12},(_,k)=>`${relAno}-${pad(k+1)}`).filter(f=>doAno.some(i=>i.fatura===f));
+  const nomes = [...new Set(doAno.map(i=>i.pessoa))];
+  const totPessoa = Object.fromEntries(nomes.map(n=>[n, soma(doAno.filter(i=>i.pessoa===n))]));
+  nomes.sort((a,b)=>totPessoa[b]-totPessoa[a]);
+  const total = soma(doAno), media = meses.length ? Math.round(total/meses.length*100)/100 : 0;
+  const recebido = soma(state.pagamentos.filter(p=>(p.data||'').startsWith(relAno)));
+  const semData = state.pagamentos.filter(p=>!p.data).length;
+  const top = nomes[0];
+  const idx = anos.indexOf(relAno);
+
+  let h = `<div class="monthnav"><button class="btn sec sm" ${idx<=0?'disabled':''} onclick="relAno='${anos[idx-1]}';renderRelatorio()">‹ ${anos[idx-1]||''}</button>
+    <div style="text-align:center"><b>${relAno}</b><div class="muted small">uso do cartão por fatura</div></div>
+    <button class="btn sec sm" ${idx>=anos.length-1?'disabled':''} onclick="relAno='${anos[idx+1]}';renderRelatorio()">${anos[idx+1]||''} ›</button></div>`;
+  h += `<div class="grid">
+    <div class="stat hl"><div class="l">Total no cartão em ${relAno}</div><div class="v">${brl(total)}</div></div>
+    <div class="stat"><div class="l">Média por fatura</div><div class="v">${brl(media)}</div></div>
+    <div class="stat"><div class="l">Quem mais usou</div><div class="v" style="font-size:17px">${top?esc(top):'—'}</div><div class="l">${top?brl(totPessoa[top]):''}</div></div>
+    <div class="stat"><div class="l">Recebido em ${relAno}</div><div class="v">${brl(recebido)}</div>${semData?`<div class="l">+ ${semData} pagamento(s) sem data</div>`:''}</div>
+  </div>`;
+  if(!doAno.length){ el.innerHTML = h + `<div class="card empty">Nenhuma parcela em ${relAno}.</div>`; return; }
+
+  h += `<div class="card"><h2>Ranking do ano</h2><div class="chartbox" style="height:${Math.max(140, nomes.length*46)}px"><canvas id="grafRel"></canvas></div><div id="grafRelMsg"></div></div>`;
+
+  h += `<div class="card"><h2>Por fatura</h2><div class="tabela"><table><thead><tr><th>Fatura</th>${nomes.map(n=>`<th><span class="dot" style="display:inline-block;background:${corDe(n)};margin-right:4px"></span>${esc(n.split(' ')[0])}</th>`).join('')}<th>Total</th></tr></thead><tbody>`;
+  meses.forEach(f=>{
+    const linha = nomes.map(n=>{ const v = soma(doAno.filter(i=>i.pessoa===n && i.fatura===f)); return `<td class="${v?'':'zero'}">${v?brl(v):'—'}</td>`; }).join('');
+    h += `<tr><td>${nomeFat(f)}</td>${linha}<td><b>${brl(soma(doAno.filter(i=>i.fatura===f)))}</b></td></tr>`;
+  });
+  h += `<tr class="tot"><td>Total</td>${nomes.map(n=>`<td>${brl(totPessoa[n])}</td>`).join('')}<td>${brl(total)}</td></tr></tbody></table></div>
+    <p class="muted small" style="margin-bottom:0">Cada parcela conta no mês da fatura em que vence.</p></div>`;
+  el.innerHTML = h;
+
+  if(chartRel){ chartRel.destroy(); chartRel = null; }
+  if(typeof Chart==='undefined'){ document.querySelector('#tab-relatorio .chartbox').classList.add('hidden');
+    document.getElementById('grafRelMsg').innerHTML = `<div class="empty">Gráfico indisponível sem internet.</div>`; return; }
+  const cs = getComputedStyle(document.documentElement), mut = cs.getPropertyValue('--mut').trim(), line = cs.getPropertyValue('--line').trim();
+  chartRel = new Chart(document.getElementById('grafRel'), {
+    type:'bar',
+    data:{ labels:nomes, datasets:[{ data:nomes.map(n=>totPessoa[n]), backgroundColor:nomes.map(corDe), borderRadius:6, barThickness:26 }] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      scales:{ x:{ticks:{color:mut,callback:v=>'R$ '+v},grid:{color:line}}, y:{ticks:{color:mut},grid:{display:false}} },
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`${brl(c.raw)} · ${Math.round(c.raw/total*100)}% do ano`}}} }
+  });
+}
+
 /* ========= Diálogos ========= */
 const dlg = document.getElementById('dlg'), dlgBody = document.getElementById('dlgBody');
 function abrirDlg(titulo, html){
@@ -475,7 +567,9 @@ function abrirExtrato(nome){
   const nq = esc(nome).replace(/'/g,"\\'");
   let h = `<div class="grid" style="grid-template-columns:1fr 1fr"><div class="stat hl"><div class="l">Falta pagar</div><div class="v">${brl(soma(its.filter(i=>!i.pago)))}</div></div>
     <div class="stat"><div class="l">Já pagou</div><div class="v">${brl(soma(pags))}</div></div></div>
-    <div class="actions" style="margin-bottom:12px"><button class="btn sm" onclick="dlgPagamento('${nq}')">+ Pagamento</button><button class="btn sec sm" onclick="renomear('${nq}')">Renomear</button></div>`;
+    <div class="actions" style="margin-bottom:12px"><button class="btn sm" onclick="dlgPagamento('${nq}')">+ Pagamento</button>
+      ${its.some(i=>!i.pago)?`<button class="btn sec sm" onclick="dlgCobrar('${nq}')">${ICONE_MSG} Cobrar</button>`:''}
+      <button class="btn sec sm" onclick="renomear('${nq}')">Renomear</button></div>`;
   const fats = [...new Set(its.map(i=>i.fatura))];
   fats.forEach(f=>{
     const fi = its.filter(i=>i.fatura===f);
@@ -495,6 +589,7 @@ function excluirPag(id,nome){ if(!confirm('Excluir este pagamento do histórico?
 function renomear(nome){
   const novo = (prompt('Novo nome para '+nome+':', nome)||'').trim(); if(!novo || novo===nome) return;
   state.itens.forEach(i=>{ if(i.pessoa===nome) i.pessoa=novo; }); state.pagamentos.forEach(p=>{ if(p.pessoa===nome) p.pessoa=novo; });
+  if(state.contatos[nome]){ state.contatos[novo] = state.contatos[nome]; delete state.contatos[nome]; }
   salvar('Renomeado'); abrirExtrato(novo);
 }
 
@@ -543,6 +638,55 @@ function dlgPagamento(nome){
     dlg.close(); salvar(msg); };
 }
 
+/* ========= Cobrança pelo WhatsApp ========= */
+const MESES_LONGOS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function nomeFatLongo(f){ const [y,m] = f.split('-').map(Number); return MESES_LONGOS[m-1]+'/'+y; }
+function soDigitos(s){ return String(s||'').replace(/\D/g,''); }
+function telWhats(s){ let d = soDigitos(s); if(d.length===10 || d.length===11) d = '55'+d; return d; }
+function textoCobranca(nome, fat){
+  const pend = state.itens.filter(i=>i.pessoa===nome && !i.pago);
+  const atuais = pend.filter(i=>i.fatura===fat);
+  const atras = pend.filter(i=>i.fatura<fat).sort((a,b)=>a.fatura.localeCompare(b.fatura));
+  const linha = i => `• ${i.descricao} (${i.parcela||'1/1'}): ${brl(i.valor)}`;
+  const primeiro = nome.split(' ')[0];
+  let t = `Oi, ${primeiro}! 😊\n`;
+  if(atuais.length){
+    t += `Segue o que ficou no meu cartão na fatura de *${nomeFatLongo(fat)}*${configurado()?` (vence ${dataVenc(fat).slice(0,5)})`:''}:\n\n`;
+    t += atuais.map(linha).join('\n') + '\n';
+  }
+  if(atras.length){
+    t += `\n${atuais.length?'E ainda em aberto de faturas anteriores':'Ficou em aberto de faturas anteriores'}:\n`;
+    t += atras.map(i=>`${linha(i)} — ${nomeFat(i.fatura)}`).join('\n') + '\n';
+  }
+  t += `\n*Total: ${brl(soma(atuais)+soma(atras))}*`;
+  if(state.config.pix) t += `\n\nPix: ${state.config.pix}`;
+  t += `\n\nValeu! 🙏`;
+  return t;
+}
+function dlgCobrar(nome, fat){
+  fat = fat || proximaFatura();
+  const tel = state.contatos[nome] || '';
+  const nq = esc(nome).replace(/'/g,"\\'");
+  abrirDlg('Cobrar '+esc(nome), `
+    <label class="f"><span>Mensagem (pode editar antes de enviar)</span><textarea id="txtCob" rows="12">${esc(textoCobranca(nome,fat))}</textarea></label>
+    <label class="f"><span>WhatsApp de ${esc(nome.split(' ')[0])} (DDD + número)</span><input type="text" id="telCob" inputmode="tel" placeholder="83 99999-9999" value="${esc(tel)}"></label>
+    <p class="muted small" style="margin-top:-6px">O número fica salvo para as próximas cobranças. Sem número, o WhatsApp pede para escolher o contato.</p>
+    <div class="actions"><button class="btn" id="bWhats">Abrir no WhatsApp</button><button class="btn sec" id="bCopCob">Copiar texto</button></div>`);
+  const guardarTel = () => { const t = soDigitos(document.getElementById('telCob').value);
+    if(t !== soDigitos(state.contatos[nome])){ if(t) state.contatos[nome] = t; else delete state.contatos[nome]; salvar(); } };
+  document.getElementById('bWhats').onclick = () => {
+    guardarTel();
+    const t = telWhats(document.getElementById('telCob').value), msg = document.getElementById('txtCob').value;
+    window.open(`https://wa.me/${t}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+  };
+  document.getElementById('bCopCob').onclick = () => {
+    guardarTel();
+    const msg = document.getElementById('txtCob').value;
+    (navigator.clipboard ? navigator.clipboard.writeText(msg) : Promise.reject()).then(()=>toast('Mensagem copiada'),()=>{ const ta=document.getElementById('txtCob'); ta.select(); document.execCommand('copy'); toast('Mensagem copiada'); });
+  };
+}
+const ICONE_MSG = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>`;
+
 /* ========= Ajustes ========= */
 function renderConfig(){
   const el = document.getElementById('tab-config'), c = state.config;
@@ -551,7 +695,9 @@ function renderConfig(){
     <form id="fCfg"><div class="two">
       <label class="f"><span>Dia de fechamento</span><input type="number" name="fechamento" min="1" max="31" value="${c.fechamento||''}" required></label>
       <label class="f"><span>Dia de vencimento</span><input type="number" name="vencimento" min="1" max="31" value="${c.vencimento||''}" required></label>
-    </div><button class="btn">Salvar</button></form></div>
+    </div>
+    <label class="f"><span>Sua chave Pix (opcional, vai no fim da mensagem de cobrança)</span><input type="text" name="pix" value="${esc(c.pix||'')}" placeholder="e-mail, celular ou chave aleatória"></label>
+    <button class="btn">Salvar</button></form></div>
   <div class="card"><h2>Importar e fazer backup</h2>
     <p class="muted small" style="margin-top:0">CSV com as colunas <code>data;pessoa;descricao;valor;parcela;status</code>. Valores negativos viram pagamentos.</p>
     <div class="actions"><button class="btn" onclick="document.getElementById('fileCsv').click()">Importar CSV</button>
@@ -565,11 +711,12 @@ function renderConfig(){
   <div class="card"><h2>Zona de perigo</h2><button class="btn danger" onclick="apagarTudo()">Apagar todos os dados</button></div>`;
   document.getElementById('fCfg').onsubmit = e=>{ e.preventDefault(); const f = e.target;
     state.config.fechamento = Math.min(31,Math.max(1,+f.fechamento.value)); state.config.vencimento = Math.min(31,Math.max(1,+f.vencimento.value));
-    faturaSel = null; salvar('Cartão configurado'); };
+    state.config.pix = f.pix.value.trim();
+    faturaSel = null; salvar('Configurações salvas'); };
 }
 function apagarTudo(){ if(!confirm('Apagar TODOS os lançamentos e pagamentos deste navegador?')) return;
   if(!confirm('Tem certeza? Sem backup não tem volta.')) return;
-  state = Object.assign(novoEstado(),{config:state.config}); salvar('Dados apagados'); }
+  state = Object.assign(novoEstado(),{config:state.config, contatos:state.contatos}); salvar('Dados apagados'); }
 
 function baixar(nome, conteudo, tipo){
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([conteudo],{type:tipo})); a.download = nome;
@@ -631,7 +778,7 @@ document.getElementById('fileJson').onchange = e=>{ const f = e.target.files[0];
   const r = new FileReader(); r.onload = ()=>{ try{ const o = JSON.parse(r.result);
     if(!Array.isArray(o.itens)) throw 0;
     if(!confirm('Restaurar este backup? O que está no app agora será substituído.')) return;
-    state = { config:Object.assign(novoEstado().config,o.config||{}), itens:o.itens, pagamentos:o.pagamentos||[] }; faturaSel=null; salvar('Backup restaurado');
+    state = normalizar(o); faturaSel=null; salvar('Backup restaurado');
   }catch(_){ toast('Arquivo de backup inválido.'); } }; r.readAsText(f); e.target.value=''; };
 
 /* ========= Toast ========= */
@@ -639,6 +786,11 @@ let tT;
 function toast(m){ const t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tT); tT = setTimeout(()=>t.classList.remove('on'),2800); }
 
 renderTudo();
+
+/* App instalável (PWA) */
+if('serviceWorker' in navigator && location.protocol !== 'file:'){
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
 </script>
 
 <!-- Configuração do seu projeto Firebase -->

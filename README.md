@@ -6,11 +6,14 @@ Lanço "Roupa · Beatriz · R$ 150 · 3x" e o app calcula em qual fatura cai cad
 
 ## Funcionalidades
 
-- **Resumo**: próxima fatura, fatura seguinte, atrasados, total a receber e gráfico por fatura/pessoa.
-- **Faturas**: navega mês a mês, marca parcelas pagas, botão "Recebi" por pessoa.
+- **Resumo**: próxima fatura, fatura seguinte, atrasados, total a receber, gráfico por fatura/pessoa e **aviso de vencimento** (quando a fatura fecha ou faltam 7 dias para vencer).
+- **Faturas**: navega mês a mês, marca parcelas pagas, botões **Cobrar** e **Recebi** por pessoa.
+- **Cobrança no WhatsApp**: mensagem pronta com os itens da fatura, atrasados, total e chave Pix; abre o WhatsApp da pessoa (o número fica salvo).
 - **Lançar**: à vista ou parcelado, pela data da compra (fatura calculada sozinha) ou escolhendo a 1ª fatura.
 - **Pessoas**: saldo, extrato, histórico de pagamentos, baixa automática das parcelas mais antigas.
-- **Ajustes**: fechamento/vencimento, importar/exportar CSV, backup JSON, conta.
+- **Relatório**: total do ano, média por fatura, quem mais usou, recebido no ano, ranking e tabela pessoa × fatura.
+- **Ajustes**: fechamento/vencimento, chave Pix, importar/exportar CSV, backup JSON, conta.
+- **App instalável (PWA)**: ícone próprio na tela inicial e abre em tela cheia, mesmo com internet fraca.
 
 **Regra das faturas:** compra **antes** do fechamento entra na fatura aberta; **no dia ou depois**, vai para a seguinte. A fatura é identificada pelo mês em que **vence**.
 
@@ -19,6 +22,10 @@ Lanço "Roupa · Beatriz · R$ 150 · 3x" e o app calcula em qual fatura cai cad
 | Arquivo | Para quê | Vai pro Git? |
 |---|---|---|
 | `index.html` | O app inteiro | ✅ |
+| `manifest.webmanifest` | Nome, cores e ícones do app instalado (PWA) | ✅ |
+| `sw.js` | Service worker: deixa o app instalável e abrir rápido/offline | ✅ |
+| `icons/` | Ícones do app (192, 512, maskable e Apple) | ✅ |
+| `.nojekyll` | Faz o GitHub Pages servir os arquivos direto | ✅ |
 | `firebase-config.js` | Config do projeto Firebase (não é senha) | ✅ |
 | `firestore.rules` | Regras de segurança, travadas no meu UID | ✅ |
 | `firebase.json` / `.firebaserc` | Usados pelo Firebase CLI para publicar as regras | ✅ |
@@ -140,7 +147,8 @@ data;pessoa;descricao;valor;parcela;status
 
 ```
 usuarios/{meu-uid}/fiado/dados
-  config:     { fechamento, vencimento }
+  config:     { fechamento, vencimento, pix }
+  contatos:   { "Beatriz": "83999990000", ... }
   itens:      [ { id, grupo, pessoa, descricao, valor, fatura: "AAAA-MM", parcela: "1/3", pago } ]
   pagamentos: [ { id, pessoa, valor, data, obs } ]
 ```
@@ -156,9 +164,10 @@ O plano gratuito (Spark) cobre esse uso com folga.
 | [Firebase Authentication](https://firebase.google.com/docs/auth) e [Cloud Firestore](https://firebase.google.com/docs/firestore) | Serviços do Google | [Termos do Firebase](https://firebase.google.com/terms) | Google |
 | [Chart.js](https://www.chartjs.org/) v4.4.1 | Gráfico | [MIT](https://github.com/chartjs/Chart.js/blob/master/LICENSE.md) | [cdnjs](https://cdnjs.com/libraries/Chart.js) |
 | Logotipo "G" do Google | Botão de login | [Diretrizes de marca do Google Sign-In](https://developers.google.com/identity/branding-guidelines) | Google |
+| Link `wa.me` do WhatsApp | Abrir conversa com a mensagem de cobrança | [Termos do WhatsApp](https://www.whatsapp.com/legal/terms-of-service) — WhatsApp é marca da Meta; o app não usa o logotipo | WhatsApp |
 | GitHub Pages | Hospedagem | [Termos do GitHub](https://docs.github.com/pt/site-policy/github-terms/github-terms-of-service) | GitHub |
 
-Demais ícones e logotipo desenhados em SVG no próprio app. Fontes do sistema.
+Logotipo, ícones do PWA (`icons/`) e ícones da interface desenhados pelo autor. Fontes do sistema.
 
 ## Autor
 
